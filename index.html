@@ -174,7 +174,6 @@ input:focus,select:focus{border-color:var(--gold-deep);background:var(--white);o
 .done.show .actions .btn{animation:fadeUp .7s var(--ease) both}
 .done.show .actions .btn:nth-child(1){animation-delay:1.1s}
 .done.show .actions .btn:nth-child(2){animation-delay:1.25s}
-.testmode{margin:1rem 0 0;padding:.6rem .9rem;border:1px dashed var(--gold);border-radius:12px;font-size:.82rem;color:var(--gold-deep)}
 @keyframes draw{to{stroke-dashoffset:0}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
 
@@ -445,7 +444,6 @@ input:focus,select:focus{border-color:var(--gold-deep);background:var(--white);o
           </a>
         </div>
         <p class="small">Se preferir, é só aguardar: o contato chega no número que você informou.</p>
-        <p class="testmode" id="testmode" hidden>Modo de teste: o webhook ainda não está configurado, então nenhum dado foi enviado.</p>
       </div>
     </div>
     </div>
@@ -784,7 +782,6 @@ form.addEventListener("submit", async e => {
     el("wa-btn").href = waLink(payload);
     el("ig-btn").href = CONFIG.INSTAGRAM_URL;
     el("card").style.setProperty("--p", 1);
-    el("testmode").hidden = !testMode;
     el("done").classList.add("show");
     el("card").scrollIntoView({ behavior: "smooth", block: "start" });
   } catch (err) {
