@@ -500,10 +500,12 @@ const CONFIG = {
   WHATSAPP_TEXT: "Olá! Acabei de me cadastrar na Black Friday da Dherma Distribuidora.",
   INSTAGRAM_URL: "https://www.instagram.com/dherma_dist/", // Instagram oficial
   PRIVACY_URL: "politica-de-privacidade.html", // link da política de privacidade
-  // Quando o evento de otimização "Lead" (ou "LeadOutraProfissao") dispara:
-  //  "whatsapp_click" (padrão): Lead = cadastro preenchido E clique em "Falar com representante".
-  //      No envio do formulário só dispara CadastroEnviado. No clique dispara Lead e Contact.
-  //  "saved": Lead = cadastro aceito pelo servidor (webhook respondeu OK). Use quando o n8n
+  // O evento de otimização é o personalizado "LeadWhatsApp" (ou "LeadOutraProfissao" para outra profissão).
+  // O "Lead" padrão não é usado, porque a Meta o gera sozinha em toda visita.
+  // Quando o evento de otimização dispara:
+  //  "whatsapp_click" (padrão): LeadWhatsApp = cadastro preenchido E clique em "Falar com representante".
+  //      No envio do formulário só dispara CadastroEnviado. No clique dispara LeadWhatsApp e Contact.
+  //  "saved": LeadWhatsApp = cadastro aceito pelo servidor (webhook respondeu OK). Use quando o n8n
   //      estiver configurado. O clique no WhatsApp dispara apenas Contact.
   LEAD_TRIGGER: "whatsapp_click",
   REQUIRE_CLINIC: true,         // true = quem não tem clínica/CNPJ não segue
@@ -697,7 +699,7 @@ function collectPayload(eventId){
 
   return {
     event_id: eventId,
-    event_name: prof.c ? "Lead" : "LeadOutraProfissao",
+    event_name: prof.c ? "LeadWhatsApp" : "LeadOutraProfissao",
     event_time: Math.floor(Date.now() / 1000),
     event_source_url: location.href.split("#")[0],
     nome: el("nome").value.trim(),
@@ -775,7 +777,7 @@ function fireLead(){
   if (!signup || signup.leadSent) return;
   signup.leadSent = true;
   if (signup.prof && signup.prof.c) {
-    track("track", "Lead", { content_name: "Black Friday Dherma", profissao: signup.prof.t }, { eventID: signup.id });
+    track("trackCustom", "LeadWhatsApp", { content_name: "Black Friday Dherma", profissao: signup.prof.t }, { eventID: signup.id });
   } else {
     track("trackCustom", "LeadOutraProfissao", { content_name: "Black Friday Dherma" }, { eventID: signup.id });
   }
@@ -815,7 +817,7 @@ form.addEventListener("submit", async e => {
     if (testMode) { console.warn("[teste] WEBHOOK_URL vazio. Payload:", payload); }
     else { await postWebhook(payload); }
 
-    // Cadastro aceito. Guarda o ID do envio: o mesmo event_id é usado no Lead e na API de Conversões (n8n).
+    // Cadastro aceito. Guarda o ID do envio: o mesmo event_id é usado no LeadWhatsApp e na API de Conversões (n8n).
     const profSel = PROFISSOES.find(p => p.v === el("profissao").value);
     signup = { id: eventId, prof: profSel, leadSent: false, contactSent: false };
     track("trackCustom", "CadastroEnviado", { content_name: "Black Friday Dherma", profissao: profSel.t }, { eventID: eventId });
